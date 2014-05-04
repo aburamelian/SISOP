@@ -1,0 +1,184 @@
+diff -r fluxboxpatchedsvn/fluxbox/src/FbTk/FbDrawable.cc fluxboxcurrentsvn/fluxbox/src/FbTk/FbDrawable.cc
+62,83d61
+< 
+< void FbDrawable::drawArc(GC gc,int x,int y,unsigned int width,unsigned int height,int angle1, int angle2){
+< 	    if (drawable() == 0 || gc == 0)
+<         return;
+<     XDrawArc(s_display,
+<                    drawable(), gc,
+<                    x, y,
+<                    width, height,angle1,angle2);
+< }
+<  
+< void FbDrawable::fillArc(GC gc,int x,int y,unsigned int width,unsigned int height,int angle1, int angle2){
+< 	    if (drawable() == 0 || gc == 0)
+<         return;
+<     XFillArc(s_display,
+<                    drawable(), gc,
+<                    x, y,
+<                    width, height,angle1,angle2);
+< }
+< 
+< 
+< 
+< 
+diff -r fluxboxpatchedsvn/fluxbox/src/FbTk/FbDrawable.hh fluxboxcurrentsvn/fluxbox/src/FbTk/FbDrawable.hh
+50,54d49
+<                              
+<                              
+<     virtual void drawArc(GC gc,int x,int y,unsigned int width,unsigned int height,int angle1, int angle2);
+<     virtual void fillArc(GC gc,int x,int y,unsigned int width,unsigned int height,int angle1, int angle2);                             
+<                              
+diff -r fluxboxpatchedsvn/fluxbox/src/Resources.cc fluxboxcurrentsvn/fluxbox/src/Resources.cc
+87,91d86
+<          else if (strcasecmp(val[i].c_str(), "AlwaysOnTop")==0)
+<             m_value.push_back(WinButton::ALWAYSONTOP);
+<         
+<         
+<         
+165,169d159
+<         case WinButton::ALWAYSONTOP:
+<           retval.append("AlwaysOnTop");
+<           break;
+< 
+<             
+diff -r fluxboxpatchedsvn/fluxbox/src/WinButton.cc fluxboxcurrentsvn/fluxbox/src/WinButton.cc
+33d32
+< #include "Layer.hh"
+143,159d141
+<         
+<         
+<     case ALWAYSONTOP:
+<       if (m_listen_to.layerNum() <= Layer::TOP ) {
+< 
+<           if (focused)
+<               return m_theme.aottedPixmap().pixmap().drawable();
+<           else
+<               return m_theme.aottedUnfocusPixmap().pixmap().drawable();
+<       } else {
+<           if (focused)
+<               return m_theme.aotPixmap().pixmap().drawable();
+<           else
+<               return m_theme.aotUnfocusPixmap().pixmap().drawable();
+<       }
+<       break;
+<         
+192,193d173
+<         
+<         
+206,208d185
+<     case ALWAYSONTOP:
+<         return m_theme.aotPressedPixmap().pixmap().drawable();
+<         
+270,294d246
+<         
+<         
+<         
+<      case ALWAYSONTOP:
+<        
+<      //  std::cout << "Mi chiedono di disegnare un bottone AOT" << std::endl;
+<         // is on top: fill arc
+<         if (m_listen_to.layerNum() <= Layer::TOP ) {
+<           std::cout << "Poiche' il layer e' " << m_listen_to.layerNum() << " lo disegno pieno" << std::endl;
+<             fillArc(gc(),
+<                            width()/5,  height()/5 ,
+<                           width()-( width()*2/5), 
+<                           height()-( height()*2/5),
+<                           0,360*64);
+<         } else {
+<        //   std::cout << "Poiche' il layer e' " << m_listen_to.layerNum() << " lo disegno vuoto" << std::endl;
+<             drawArc(gc(),
+<                            width()/5,  height()/5 ,
+<                           width()-( width()*2/5), 
+<                           height()-( height()*2/5),
+<                           0,360*64);
+<         }
+<         break;
+< 
+<         
+diff -r fluxboxpatchedsvn/fluxbox/src/WinButton.hh fluxboxcurrentsvn/fluxbox/src/WinButton.hh
+38,39c38,39
+<     /// draw type for withe button
+<     enum Type {MAXIMIZE, MINIMIZE, SHADE, STICK, ALWAYSONTOP,CLOSE, MENUICON};
+---
+>     /// draw type for the button
+>     enum Type {MAXIMIZE, MINIMIZE, SHADE, STICK, CLOSE, MENUICON};
+diff -r fluxboxpatchedsvn/fluxbox/src/WinButtonTheme.cc fluxboxcurrentsvn/fluxbox/src/WinButtonTheme.cc
+59,66d58
+<     m_aot_pm(*this, "window.aot.pixmap", "Window.Aot.Pixmap"),
+<     m_aot_unfocus_pm(*this, "window.aot.unfocus.pixmap", "Window.Aot.Unfocus.Pixmap"),
+<     m_aot_pressed_pm(*this, "window.aot.pressed.pixmap", "Window.Aot.Pressed.Pixmap"),
+<     m_aotted_pm(*this, "window.aotted.pixmap", "Window.Aotted.Pixmap"),
+<     m_aotted_unfocus_pm(*this, "window.aotted.unfocus.pixmap", "Window.Aotted.Unfocus.Pixmap"),
+<     
+<     
+<     
+119,127d110
+<     
+<     m_aot_pm->scale(size, size);
+<     m_aot_unfocus_pm->scale(size, size);
+<     m_aot_pressed_pm->scale(size, size);
+<   
+<     m_aotted_pm->scale(size, size);
+<     m_aotted_unfocus_pm->scale(size, size);
+<     
+<     
+diff -r fluxboxpatchedsvn/fluxbox/src/WinButtonTheme.hh fluxboxcurrentsvn/fluxbox/src/WinButtonTheme.hh
+66,75d65
+<     
+<     // alwaysontop    
+<     const FbTk::PixmapWithMask &aotPixmap() const { return *m_aot_pm; }
+<     FbTk::PixmapWithMask &aotPixmap() { return *m_aot_pm; }
+<     FbTk::PixmapWithMask &aotUnfocusPixmap() { return *m_aot_unfocus_pm; }
+<     const FbTk::PixmapWithMask &aotPressedPixmap() const { return *m_aot_pressed_pm; }
+<     FbTk::PixmapWithMask &aotPressedPixmap() { return *m_aot_pressed_pm; }
+< 
+<     FbTk::PixmapWithMask &aottedPixmap() { return *m_aotted_pm; }
+<     FbTk::PixmapWithMask &aottedUnfocusPixmap() { return *m_aotted_unfocus_pm; }
+112,114d101
+<     FbTk::ThemeItem<FbTk::PixmapWithMask> m_aot_pm, m_aot_unfocus_pm, m_aot_pressed_pm;    
+<     FbTk::ThemeItem<FbTk::PixmapWithMask> m_aotted_pm, m_aotted_unfocus_pm; 
+< 
+diff -r fluxboxpatchedsvn/fluxbox/src/Window.cc fluxboxcurrentsvn/fluxbox/src/Window.cc
+1896,1911d1895
+< void FluxboxWindow::toggleAot() {
+<   // if is already there we send to the normal layer
+<   if (layerNum()<= ::Layer::TOP){
+<     moveToLayer( ::Layer::NORMAL);
+<   }
+<   else {
+<     moveToLayer( ::Layer::TOP);
+<   }
+<   if (m_initialized) {
+<       setState(m_current_state, false);
+<       // notify since some things consider "stuck" to be a pseudo-workspace
+<       m_workspacesig.notify();
+<   }
+< 
+< }
+< 
+3787,3788d3770
+< 
+< 
+4008d3989
+<     CommandRef aot_cmd(new WindowCmd(*this, &FluxboxWindow::toggleAot));
+4038,4039c4019
+<             WinButton::STICK,
+<             WinButton::ALWAYSONTOP
+---
+>             WinButton::STICK
+4121,4131d4100
+<                 
+<              case WinButton::ALWAYSONTOP:    
+<                 winbtn = new WinButton(*this, winbutton_theme,
+<                        WinButton::ALWAYSONTOP,
+<                        frame().titlebar(),
+<                        0, 0, 10, 10);
+<                        
+<                  stateSig().attach(winbtn);       
+<                  winbtn->setOnClick(aot_cmd);
+<                  break ;
+<                 
+diff -r fluxboxpatchedsvn/fluxbox/src/Window.hh fluxboxcurrentsvn/fluxbox/src/Window.hh
+228d227
+<     void toggleAot();
